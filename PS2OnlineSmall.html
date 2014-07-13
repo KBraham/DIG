@@ -1,0 +1,114 @@
+<style>
+
+.bar:nth-child(even)
+{
+	background-color: #333333;
+}
+
+</style>
+
+<div id="wrapper" style="width: 200px; overflow: hidden;">
+	<div id="DIG" style="width: 95px; float: left; font-size: 18px; margin-right: 10px;">
+		<img src="http://files.enjin.com/343339/site_logo/DIG-logo-small.png" title="" alt="" width="95" height="95" style="border: none;" />
+		<a id="DIGPlayers" href="http://dignityofwar.com/ps2online" style="display: block; text-align: center; margin: 0px; margin-top: 10px; margin-bottom: 10px;"></a>
+	</div>
+	<div id="DIGT" style="width: 95px; float: left; font-size: 18px;">
+	<img src="http://files.enjin.com/343339/site_logo/DIGT-logo2.png" title="" alt="" width="95" height="95" style="border: none;" />
+		<a id="DIGTPlayers" href="http://dignityofwar.com/ps2online" style="display: block; text-align: center; margin: 0px; margin-top: 10px; margin-bottom: 10px"></a>
+	</div>
+	<p id="loading" style="text-align: center;">Loading players...</p>
+	<p id="updated" style="text-align: center; margin-top: 5px;"></p>
+</div>
+
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+	var refreshTimer = null;
+	window.jQuery(document).ready(function ($) {
+		doIngameStatus();
+	});
+
+	function doIngameStatus() {
+
+		//DIG
+		$.ajax({
+			url: 'https://census.soe.com/s:DIGT/get/ps2:v2/outfit/37509488620604883/?c:resolve=member_character_name,member_online_status',
+			type: 'GET',
+			timeout: 20000,
+			dataType: 'jsonp',
+			success: onMembersReceived,
+			complete: onMembersComplete
+		});
+
+		// DIGT
+		$.ajax({
+			url: 'https://census.soe.com/s:DIGT/get/ps2:v2/outfit/37514584004240963/?c:resolve=member_character_name,member_online_status',
+			type: 'GET',
+			timeout: 20000,
+			dataType: 'jsonp',
+			success: onMembersReceivedT,
+		});
+	}
+
+	function onMembersReceived(json) {
+		var DIGingame_members = countOnlineMembersDIG(json.outfit_list[0].members);
+		$('#DIGPlayers').html(DIGingame_members.length + ' Online');
+
+		if ( $("#loading").is(":visible"))
+		{
+			$("#loading").hide();
+		}
+	}
+
+	function onMembersReceivedT(json) {
+		var DIGTingame_members = countOnlineMembersDIGT(json.outfit_list[0].members);
+		$('#DIGTPlayers').html(DIGTingame_members.length + ' Online');
+		
+		if ( $("#loading").is(":visible"))
+		{
+			$("#loading").hide();
+		}
+	}
+
+	function countOnlineMembersDIG(outfit_member_list) {
+		var ingameDIG = new Array();
+		var name = 0;
+		while (name < outfit_member_list.length) 
+		{
+			if (outfit_member_list[name].online_status > 0) 
+			{
+				ingameDIG.push({
+					player: outfit_member_list[name].name.first,
+				});
+			}
+
+			name++;
+		}
+		return ingameDIG;
+	}
+
+	function countOnlineMembersDIGT(outfit_member_list) {
+		var ingameDIGT = new Array();
+		var name = 0;
+		while (name < outfit_member_list.length) 
+		{
+			if (outfit_member_list[name].online_status > 0) 
+			{
+				ingameDIGT.push({
+					player: outfit_member_list[name].name.first,
+				});
+			}
+
+			name++;
+		}
+		return ingameDIGT;
+	}
+
+	function onMembersComplete(jqQuery, jqStatus) {
+		var now = new Date();
+		$("#updated").text("Updated: " + now.toTimeString() );
+		setTimeout(function() 
+		{	
+			doIngameStatus(); 
+		}, 60000); // Every 60 seconds
+	}
+</script>

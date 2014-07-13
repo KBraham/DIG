@@ -1,0 +1,206 @@
+<style>
+
+
+#ingameDIG, #ingameDIGT
+{
+	display: table;
+}
+
+.bar:nth-child(even)
+{
+	background-color: #333333;
+}
+
+.bar
+{
+	height: 25px;
+	width: 420px;
+}
+
+.bar img
+{
+	width: 20px;
+	height: 20px;
+	padding-top: 3px;
+	padding-left: 3px;
+	margin-right: 5px;
+	float: left;
+}
+
+.bar span
+{
+	margin: 0px;
+	display: table-cell;
+	font-size: 16px;
+	line-height: 27px;
+}
+
+</style>
+
+<p>
+<p style="font-size: 18pt; text-align: center;">Planetside 2 Players Online:</p>
+<div id="wrapper" style="width: 865px;">
+	<div id="ps2-ingame" style="width: 420px; float: left; margin-right: 20px;">
+		<div class="element_smalltitle">
+			<div class="left">
+				<!-- -->
+			</div>
+			<div class="right">
+				<!-- -->
+			</div>
+			<div id="in-game-members-headerDIG" class="title">DIG Members Online:  <span id="DIGPlayerCount"></div>
+			<div id="ingameDIG" class="m_shoutbox" style="height: auto; background-color: #111111;">
+			</div>
+		</div>
+		<div id="ingameDIG" class="m_shoutbox" style="height: auto; background-color: #111111;"></div>
+	</div>
+
+	<div id="ps2-ingame" style="width: 420px; float: left">
+		<div class="element_smalltitle">
+			<div class="left">
+				<!-- -->
+			</div>
+			<div class="right">
+				<!-- -->
+			</div>
+			<div id="in-game-members-headerDIGT" class="title">DIGT Members Online: <span id="DIGTPlayerCount"></div>
+		</div>
+		<div id="ingameDIGT" class="m_shoutbox" style="height: auto; background-color: #111111;"></div>
+	</div>
+
+	<div id="ps2-ingame-as-of" style="width: 100%; text-align: center; margin-top: 10px; margin-left: auto; margin-right: auto; display: inline-block"></div>
+		<div class="element_smallbutton">
+			<div class="l">
+				<!-- -->
+			</div>
+			<div class="r">
+				<!-- -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+	window.jQuery(document).ready(function ($) {
+		doIngameStatus();
+	});
+
+	function doIngameStatus() {
+
+		$("#ingameDIG").html('');
+		$("#ingameDIGT").html('');
+		//DIG
+		$.ajax({
+			url: 'https://census.soe.com/s:DIGT/get/ps2:v2/outfit/37509488620604883/?c:resolve=member_character_name,member_online_status',
+			type: 'GET',
+			timeout: 20000,
+			dataType: 'jsonp',
+			success: onMembersReceived,
+			complete: onMembersComplete
+		});
+
+		// DIGT
+		$.ajax({
+			url: 'https://census.soe.com/s:DIGT/get/ps2:v2/outfit/37514584004240963/?c:resolve=member_character_name,member_online_status',
+			type: 'GET',
+			timeout: 20000,
+			dataType: 'jsonp',
+			success: onMembersReceivedT,
+			complete: onMembersComplete
+		});
+	}
+
+	function onMembersReceived(json) {
+		var now = new Date();
+
+		var DIGingame_members = countOnlineMembersDIG(json.outfit_list[0].members);
+		$('#DIGPlayerCount').html(DIGingame_members.length);
+
+		if ( $("#loading").is(":visible"))
+		{
+			$("#loading").hide();
+		}
+		
+		$("#updated").text("Updated: " + now.toTimeString() );
+	}
+
+	function onMembersReceivedT(json) {
+		var now = new Date();
+
+		var DIGTingame_members = countOnlineMembersDIGT(json.outfit_list[0].members);
+		$('#DIGTPlayerCount').html(DIGTingame_members.length);
+		
+		if ( $("#loading").is(":visible"))
+		{
+			$("#loading").hide();
+		}
+		
+		$("#updated").text("Updated: " + now.toTimeString() );
+	}
+
+	function countOnlineMembersDIG(outfit_member_list) {
+		var ingameDIG = new Array();
+		var name = 0;
+		while (name < outfit_member_list.length) 
+		{
+			if (outfit_member_list[name].online_status > 0) 
+			{
+				ingameDIG.push({
+					name: outfit_member_list[name].name.first,
+					rank: outfit_member_list[name].rank,
+					order: outfit_member_list[name].rank_ordinal,
+				});
+			}
+
+			name++;
+		}
+
+		var count = 0;
+
+		while (count < ingameDIG.length)
+		{
+			$("#ingameDIG").append('<div class="bar"><img src="http://files.enjin.com/343339/site_logo/online.png"> <span><b>'+ ingameDIG[count].name +'</b> ('+ ingameDIG[count].rank +')</span>  </div>');
+
+			count++;
+		}
+
+		return ingameDIG;
+	}
+
+	function countOnlineMembersDIGT(outfit_member_list) {
+		var ingameDIGT = new Array();
+		var name = 0;
+		while (name < outfit_member_list.length) 
+		{
+			if (outfit_member_list[name].online_status > 0) 
+			{
+				ingameDIGT.push({
+					player: outfit_member_list[name].name.first,
+				});
+
+				$("#ingameDIGT").append('<div class="bar"><img src="http://files.enjin.com/343339/site_logo/online.png"> <span>'+ outfit_member_list[name].name.first +'</span>  </div>');
+			}
+
+			name++;
+		}
+
+		var count = 0;
+
+		while (count < ingameDIGT.length)
+		{
+			$("#ingameDIG").append('<div class="bar"><img src="http://files.enjin.com/343339/site_logo/online.png"> <span><b>'+ ingameDIGT[count].name +'</b> ('+ ingameDIGT[count].rank +')</span>  </div>');
+
+			count++;
+		}
+
+		return ingameDIGT;
+	}
+
+	function onMembersComplete(jqQuery, jqStatus) {
+		setTimeout(function() 
+		{	
+			doIngameStatus(); 
+		}, 60000); // Every 60 seconds
+	}
+</script>
