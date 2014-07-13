@@ -173,10 +173,10 @@
 			if (outfit_member_list[name].online_status > 0) 
 			{
 				ingameDIGT.push({
-					player: outfit_member_list[name].name.first,
+					name: outfit_member_list[name].name.first,
+					rank: outfit_member_list[name].rank,
+					order: outfit_member_list[name].rank_ordinal,
 				});
-
-				$("#ingameDIGT").append('<div class="bar"><img src="http://files.enjin.com/343339/site_logo/online.png"> <span>'+ outfit_member_list[name].name.first +'</span>  </div>');
 			}
 
 			name++;
@@ -186,7 +186,7 @@
 
 		while (count < ingameDIGT.length)
 		{
-			$("#ingameDIG").append('<div class="bar"><img src="http://files.enjin.com/343339/site_logo/online.png"> <span><b>'+ ingameDIGT[count].name +'</b> ('+ ingameDIGT[count].rank +')</span>  </div>');
+			$("#ingameDIGT").append('<div class="bar"><img src="http://files.enjin.com/343339/site_logo/online.png"> <span><b>'+ ingameDIGT[count].name +'</b> ('+ ingameDIGT[count].rank +')</span>  </div>');
 
 			count++;
 		}
