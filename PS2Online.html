@@ -86,8 +86,6 @@
 
 	function doIngameStatus() {
 
-		$("#ingameDIG").html('');
-		$("#ingameDIGT").html('');
 		//DIG
 		$.ajax({
 			url: 'https://census.soe.com/s:DIGT/get/ps2:v2/outfit/37509488620604883/?c:resolve=member_character_name,member_online_status',
@@ -153,6 +151,7 @@
 			name++;
 		}
 
+		$("#ingameDIG").html('');
 		var count = 0;
 
 		while (count < ingameDIG.length)
@@ -182,6 +181,7 @@
 			name++;
 		}
 
+		$("#ingameDIGT").html('');
 		var count = 0;
 
 		while (count < ingameDIGT.length)
